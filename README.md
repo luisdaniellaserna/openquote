@@ -2,7 +2,7 @@
   <img src="assets/landingpage.png" alt="A quote by Plato centered on the OpenCode home screen" width="900px">
 </p>
 
-<h1 align="center">opencode-quotes-plugin</h1>
+<h1 align="center">openquote</h1>
 
 <p align="center"><em>Motivational quotes for your OpenCode home screen.</em></p>
 
@@ -16,19 +16,22 @@ Land on the OpenCode home screen and a quote is already waiting: one quiet,
 centered line below the prompt instead of the usual rotating tips. Keep the
 built-in collection, or curate your own.
 
-> A V2 re-implementation of
+> [!NOTE]
+> `openquote` is a V2 re-implementation of
 > [aerovato/opencode-quotes-plugin](https://github.com/aerovato/opencode-quotes-plugin).
 > Same quotes, same idea, rebuilt for OpenCode 2.x.
+> Repository: [luisdaniellaserna/openquote](https://github.com/luisdaniellaserna/openquote).
+> The published package keeps the name `opencode-quotes-plugin`.
 
-## What you get
+## Features
 
-- **A quote on the home screen** - centered below the prompt, word-wrapped, and picked at random from the active source.
+- **A quote on the home screen** — centered below the prompt, word-wrapped, and picked at random from the active source.
 - **100+ built-in quotes** from historical figures and thinkers.
-- **Your own quotes** - add and remove them from the command palette.
-- **Three sources** - show `built-in`, `custom`, or `both`.
-- **Pin one** - keep a specific quote for the session instead of a random pick.
-- **Toggle it off** - hide quotes without uninstalling anything.
-- **Persistent** - quotes and settings survive restarts and stay in sync.
+- **Your own quotes** — add and remove them from the command palette.
+- **Three sources** — show `builtin`, `custom`, or `both`.
+- **Pin one** — keep a specific quote for the session instead of a random pick.
+- **Toggle it off** — hide quotes without uninstalling anything.
+- **Persistent** — quotes and settings survive restarts and stay in sync.
 
 ## Preview
 
@@ -38,7 +41,7 @@ built-in collection, or curate your own.
 
 ## Install
 
-Add the package to the global CLI config at `~/.config/opencode/cli.json`:
+Add the published package to the global CLI config at `~/.config/opencode/cli.json`:
 
 ```jsonc
 {
@@ -46,11 +49,11 @@ Add the package to the global CLI config at `~/.config/opencode/cli.json`:
 }
 ```
 
-Working on the plugin itself? Point OpenCode at the checkout instead:
+Working on `openquote` itself? Point OpenCode at the checkout instead:
 
 ```jsonc
 {
-  "plugins": ["file:///C:/path/to/opencode-quotes-plugin"]
+  "plugins": ["file:///C:/path/to/openquote"]
 }
 ```
 
@@ -60,7 +63,11 @@ Restart OpenCode and check that it loaded:
 opencode plugin list
 ```
 
-## Commands
+> [!TIP]
+> The repository folder is `openquote`, but `package.json` and the plugin ID
+> remain `opencode-quotes-plugin` for backward compatibility.
+
+## Usage
 
 Open the palette on the home screen (`ctrl+p`) and pick a command:
 
@@ -72,18 +79,23 @@ Open the palette on the home screen (`ctrl+p`) and pick a command:
 | **Remove quote**              | Delete one of your saved quotes          |
 | **Select quote**              | Pin a quote instead of a random one      |
 
-## Quote sources
+### Quote sources
 
-| Source     | Shows                         |
-| ---------- | ----------------------------- |
-| `built-in` | The bundled collection only   |
-| `custom`   | Only the quotes you added     |
-| `both`     | Both, de-duplicated (default) |
+| Source    | Shows                         |
+| --------- | ----------------------------- |
+| `builtin` | The bundled collection only   |
+| `custom`  | Only the quotes you added     |
+| `both`    | Both, de-duplicated (default) |
 
-## Where your quotes live
+> [!IMPORTANT]
+> `Add quote` expects the exact format `"Your quote here" - Author Name`.
+> Anything else is rejected with an error toast.
+
+### Where your quotes live
 
 Custom quotes, the active source, and visibility are kept in OpenCode's plugin
-storage, so they survive restarts and sync across TUI instances.
+storage (`ctx.storage.store("state", ...)` in `tui.tsx`), so they survive
+restarts and sync across TUI instances.
 
 ## How it works
 
@@ -95,9 +107,13 @@ import { Plugin } from "@opencode/plugin/tui";
 export default Plugin.define({ id: "opencode-quotes-plugin", setup(ctx) { /* ... */ } });
 ```
 
-On the home route the quote is drawn as a centered overlay and the stock footer
-tips are suppressed, since the V2 home footer is pinned to the bottom of the
-screen.
+- On the home route the quote is drawn as a centered overlay (`ui.tsx:View`)
+  and the stock footer tips are suppressed, since the V2 home footer is pinned
+  to the bottom of the screen.
+- `index.ts` is a server-side stub; all rendering happens in the `./tui` export.
+- `utils.ts` holds the pure helpers: `parseQuoteInput`, `deduplicateQuotes`,
+  `getQuotesForSource`, and `wordWrap`.
+- `quotes.ts` holds the bundled `QUOTES` corpus.
 
 ## Development
 
@@ -106,6 +122,9 @@ bun install
 bun test        # unit tests for the pure helpers
 bun run typecheck
 ```
+
+Tests live in `tests/utils.test.ts` and cover parsing, deduplication, source
+selection, and word wrapping.
 
 ## Credits
 
