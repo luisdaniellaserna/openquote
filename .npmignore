@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Development files
+bun.lock
+tsconfig.json
+docs/
+tests/
+node_modules/
